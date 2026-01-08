@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miriam Birthday - Mobile Ready</title>
+    <title>Miriam Birthday - Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
     <style>
+        /* --- PALETA DE COLORES --- */
         :root {
             --party-green: #00C69D;
             --party-pink: #FD52B0;
@@ -26,7 +27,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            padding: 10px;
+            padding: 10px; /* Un poco de espacio en móviles */
         }
 
         canvas {
@@ -35,63 +36,52 @@
             pointer-events: none; z-index: 1;
         }
 
-        /* Contenedor Principal Responsive */
+        /* TARJETA PRINCIPAL RESPONSIVE */
         .card {
             background-color: var(--card-bg);
-            width: 100%;
-            max-width: 950px;
-            min-height: 480px;
+            width: 100%; max-width: 950px;
+            min-height: 480px; /* Altura mínima flexible */
             border-radius: 40px;
             display: flex;
-            flex-direction: row; /* Horizontal por defecto */
+            flex-direction: row; /* Horizontal en PC */
             overflow: hidden;
             box-shadow: 0 30px 60px rgba(0,0,0,0.7);
             border: 2px solid var(--party-blue);
             z-index: 10;
         }
 
-        /* Panel de Texto */
+        /* PANEL DE TEXTO */
         .left-panel {
             flex: 1.2;
             padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
         }
 
         h1 {
-            font-size: clamp(1.8rem, 5vw, 3.2rem); /* Tamaño dinámico */
+            /* Tamaño dinámico de fuente */
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
             color: white;
             text-shadow: 3px 3px 0 var(--party-pink);
-            margin-bottom: 10px;
-            line-height: 1.1;
+            margin-bottom: 10px; line-height: 1.1;
         }
 
         #name-display {
             color: var(--party-yellow);
             font-size: clamp(1.2rem, 3vw, 1.8rem);
             font-weight: 700;
-            margin-bottom: 30px;
-            text-transform: uppercase;
+            margin-bottom: 30px; text-transform: uppercase;
         }
 
-        /* Contador Flexible */
         .countdown {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap; /* Permite que los cuadros bajen en móviles pequeños */
+            display: flex; gap: 10px; justify-content: center;
+            flex-wrap: wrap; /* Permite que los cuadros se acomoden */
         }
 
         .time-box {
-            background: rgba(0,0,0,0.3);
-            border: 2px solid white;
-            border-radius: 20px;
-            padding: 15px 10px;
-            min-width: 80px;
-            flex: 1;
+            background: rgba(0,0,0,0.3); border: 2px solid white;
+            border-radius: 20px; padding: 15px 10px;
+            min-width: 80px; flex: 1; /* Ancho flexible */
         }
 
         .box-d { border-bottom: 6px solid var(--party-green); }
@@ -99,62 +89,36 @@
         .box-m { border-bottom: 6px solid var(--party-blue); }
         .box-s { border-bottom: 6px solid var(--party-orange); }
 
-        .number { 
-            font-size: clamp(1.5rem, 4vw, 2.5rem); 
-            font-weight: 900; 
-            color: white; 
-            display: block; 
-        }
-        
-        .label { 
-            font-size: 0.65rem; 
-            color: #aaa; 
-            font-weight: bold; 
-        }
+        .number { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 900; color: white; display: block; }
+        .label { font-size: 0.65rem; color: #aaa; font-weight: bold; }
 
-        /* Panel de Imagen */
+        /* PANEL DE IMAGEN */
         .right-panel {
             flex: 0.8;
             background: #222;
-            min-height: 300px;
+            min-height: 300px; /* Altura mínima para que se vea bien en móvil */
         }
 
         #card-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
         }
 
-        /* AJUSTES PARA MÓVILES (Pantallas de menos de 768px) */
+        /* --- MEDIA QUERY PARA MÓVILES --- */
         @media (max-width: 768px) {
             .card {
                 flex-direction: column-reverse; /* Imagen arriba, texto abajo */
                 height: auto;
                 max-width: 450px;
-                border-radius: 30px;
             }
-
-            .right-panel {
-                flex: none;
-                height: 350px; /* Tamaño fijo para la foto en móvil */
+            .right-panel { flex: none; height: 350px; } /* Altura fija para la imagen en móvil */
+            .left-panel { padding: 30px 15px; }
+            .countdown { 
+                display: grid; grid-template-columns: 1fr 1fr; /* 2x2 en móviles */
+                width: 100%; gap: 10px;
             }
-
-            .left-panel {
-                padding: 30px 15px;
-            }
-
-            .countdown {
-                display: grid;
-                grid-template-columns: 1fr 1fr; /* 2x2 en móviles */
-                width: 100%;
-                gap: 10px;
-            }
-
-            .time-box {
-                min-width: unset;
-                padding: 10px;
-            }
+            .time-box { min-width: unset; padding: 10px; }
+            .label { font-size: 0.6rem; } /* Etiquetas más pequeñas */
         }
     </style>
 </head>
@@ -174,7 +138,7 @@
             </div>
         </div>
         <div class="right-panel">
-            <img id="card-image" src="https://i.imgur.com/8Q5X12K.png" alt="Retrato Miriam">
+            <img id="card-image" src="https://pbs.twimg.com/media/GNd0IRjWYAAKo6R.jpg" alt="Retrato Miriam">
         </div>
     </div>
 
