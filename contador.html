@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday App - Performance Fix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --party-green: #00C69D;
+            --party-pink: #FD52B0;
+            --party-blue: #09BCFF;
+            --party-orange: #FE7A39;
+            --party-yellow: #F3E65F;
+            --bg-dark: #0f0f12;
+            --card-bg: #2d343a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            background: radial-gradient(circle at center, #1e272e 0%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        #settings-btn {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            background: var(--party-pink); color: white;
+            width: 55px; height: 55px; border-radius: 50%;
+            border: 3px solid white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px var(--party-pink);
+            transition: 0.3s;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            width: 95%; max-width: 950px;
+            height: 480px; border-radius: 40px;
+            display: flex; overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            border: 2px solid var(--party-blue);
+            z-index: 10;
+        }
+
+        .left-panel {
+            flex: 1.2; padding: 40px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+
+        h1 {
+            font-size: 3.2rem; color: white;
+            text-shadow: 3px 3px 0 var(--party-pink);
+            margin-bottom: 5px; line-height: 1.1;
+        }
+
+        #name-display {
+            color: var(--party-yellow);
+            font-size: 1.8rem; font-weight: 700;
+            margin-bottom: 35px; text-transform: uppercase;
+        }
+
+        .countdown { display: flex; gap: 15px; }
+
+        .time-box {
+            background: rgba(0,0,0,0.3); border: 2px solid white;
+            border-radius: 20px; padding: 15px; min-width: 90px;
+        }
+
+        .box-d { border-bottom: 6px solid var(--party-green); }
+        .box-h { border-bottom: 6px solid var(--party-pink); }
+        .box-m { border-bottom: 6px solid var(--party-blue); }
+        .box-s { border-bottom: 6px solid var(--party-orange); }
+
+        .number { font-size: 2.5rem; font-weight: 900; color: white; display: block; }
+        .label { font-size: 0.7rem; color: #aaa; font-weight: bold; }
+
+        .right-panel { flex: 0.8; background: #222; }
+        #card-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: none;
+            align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal {
+            background: white; padding: 30px; border-radius: 30px;
+            width: 90%; max-width: 400px; color: #333;
+        }
+        input { width: 100%; padding: 12px; margin: 10px 0 15px; border: 2px solid #ddd; border-radius: 12px; }
+        .btn-save { background: var(--party-green); color: white; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        .btn-test { background: var(--party-blue); color: white; border: none; padding: 10px; width: 100%; border-radius: 15px; margin-top: 10px; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .card { flex-direction: column; height: auto; }
+            .right-panel { height: 250px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="celebration-canvas"></canvas>
+
+    <button id="settings-btn" onclick="openModal()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+
+    <div class="card">
+        <div class="left-panel">
+            <h1>¡FELIZ CUMPLEAÑOS!</h1>
+            <div id="name-display">FESTEJADO: Miriam</div>
+            <div class="countdown">
+                <div class="time-box box-d"><span class="number" id="d">00</span><span class="label">DÍAS</span></div>
+                <div class="time-box box-h"><span class="number" id="h">00</span><span class="label">HORAS</span></div>
+                <div class="time-box box-m"><span class="number" id="m">00</span><span class="label">MINUTOS</span></div>
+                <div class="time-box box-s"><span class="number" id="s">00</span><span class="label">SEGUNDOS</span></div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <img id="card-image" src="https://i.imgur.com/8Q5X12K.png" alt="Retrato">
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h2>Configuración</h2>
+            <input type="text" id="inName" placeholder="Nombre">
+            <input type="date" id="inDate">
+            <input type="text" id="inPhoto" placeholder="Link de Imagen (URL)">
+            <button class="btn-save" onclick="saveConfig()">Guardar Todo</button>
+            <button class="btn-test" onclick="testCelebration()">Probar Show</button>
+            <p onclick="closeModal()" style="margin-top:15px; cursor:pointer; text-align:center; color:gray;">Cerrar</p>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modal');
+        const canvas = document.getElementById('celebration-canvas');
+        const ctx = canvas.getContext('2d');
+        let countdownInterval, confetti = [], fireworks = [], isCelebrating = false;
+        const colors = ['#00C69D', '#E2C2F3', '#09BCFF', '#F3E65F', '#FE7A39', '#FD52B0'];
+
+        function openModal() { modal.style.display = 'flex'; }
+        function closeModal() { modal.style.display = 'none'; }
+
+        function saveConfig() {
+            const data = {
+                name: document.getElementById('inName').value,
+                date: document.getElementById('inDate').value,
+                photo: document.getElementById('inPhoto').value
+            };
+            localStorage.setItem('birthday_v3', JSON.stringify(data));
+            applyConfig();
+            closeModal();
+        }
+
+        function applyConfig() {
+            const data = JSON.parse(localStorage.getItem('birthday_v3'));
+            if (!data) return;
+            document.getElementById('name-display').innerText = `FESTEJADO: ${data.name || 'Miriam'}`;
+            if(data.photo) document.getElementById('card-image').src = data.photo;
+
+            clearInterval(countdownInterval);
+            if(!data.date) return;
+            const p = data.date.split('-');
+            
+            countdownInterval = setInterval(() => {
+                const now = new Date();
+                let target = new Date(now.getFullYear(), p[1]-1, p[2], 12, 0, 0);
+                if (now > target && (now.getDate() != p[2] || now.getMonth() != p[1]-1)) target.setFullYear(now.getFullYear()+1);
+                
+                const diff = target - now;
+                if (diff <= 0 && diff > -43200000) {
+                    if (!isCelebrating) startCelebration();
+                } else {
+                    isCelebrating = false;
+                }
+
+                document.getElementById('d').innerText = Math.max(0, Math.floor(diff/86400000)).toString().padStart(2,'0');
+                document.getElementById('h').innerText = Math.max(0, Math.floor((diff%86400000)/3600000)).toString().padStart(2,'0');
+                document.getElementById('m').innerText = Math.max(0, Math.floor((diff%3600000)/60000)).toString().padStart(2,'0');
+                document.getElementById('s').innerText = Math.max(0, Math.floor((diff%60000)/1000)).toString().padStart(2,'0');
+            }, 1000);
+        }
+
+        function testCelebration() {
+            closeModal();
+            startCelebration();
+            setTimeout(() => { isCelebrating = false; }, 10000);
+        }
+
+        function startCelebration() {
+            if(isCelebrating) return;
+            isCelebrating = true;
+            resizeCanvas();
+            confetti = Array.from({length: 120}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 8 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: Math.random() * 3 + 2,
+                drift: Math.random() * 2 - 1
+            }));
+            fireworks = [];
+            requestAnimationFrame(animate);
+        }
+
+        function animate() {
+            if (!isCelebrating && fireworks.length === 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Confeti
+            confetti.forEach(p => {
+                ctx.fillStyle = p.color;
+                p.y += p.speed; p.x += p.drift;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                if (p.y > canvas.height) p.y = -10;
+            });
+
+            // Fuegos Artificiales
+            if (isCelebrating && Math.random() < 0.04) {
+                fireworks.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height,
+                    targetY: Math.random() * (canvas.height * 0.5),
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    particles: [],
+                    exploded: false
+                });
+            }
+
+            fireworks.forEach((f, i) => {
+                if (!f.exploded) {
+                    f.y -= 7;
+                    ctx.fillStyle = f.color;
+                    ctx.fillRect(f.x, f.y, 2, 12);
+                    if (f.y <= f.targetY) {
+                        f.exploded = true;
+                        for (let j = 0; j < 35; j++) {
+                            const ang = Math.random() * Math.PI * 2;
+                            const spd = Math.random() * 4 + 2;
+                            f.particles.push({ x: f.x, y: f.y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, alpha: 1 });
+                        }
+                    }
+                } else {
+                    f.particles.forEach(p => {
+                        p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= 0.015;
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.fillStyle = f.color;
+                        ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
+                    });
+                    f.particles = f.particles.filter(p => p.alpha > 0);
+                }
+            });
+            fireworks = fireworks.filter(f => !f.exploded || f.particles.length > 0);
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animate);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('birthday_v3');
+            if(saved) {
+                const d = JSON.parse(saved);
+                document.getElementById('inName').value = d.name || '';
+                document.getElementById('inDate').value = d.date || '';
+                document.getElementById('inPhoto').value = d.photo || '';
+            }
+            applyConfig();
+            window.addEventListener('resize', resizeCanvas);
+        };
+    </script>
+</body>
+</html>
