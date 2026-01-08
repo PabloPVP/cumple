@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuenta Regresiva - Miriam</title>
+    <title>Miriam Birthday - Mobile Ready</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -26,6 +26,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            padding: 10px;
         }
 
         canvas {
@@ -34,39 +35,63 @@
             pointer-events: none; z-index: 1;
         }
 
+        /* Contenedor Principal Responsive */
         .card {
             background-color: var(--card-bg);
-            width: 95%; max-width: 950px;
-            height: 480px; border-radius: 40px;
-            display: flex; overflow: hidden;
+            width: 100%;
+            max-width: 950px;
+            min-height: 480px;
+            border-radius: 40px;
+            display: flex;
+            flex-direction: row; /* Horizontal por defecto */
+            overflow: hidden;
             box-shadow: 0 30px 60px rgba(0,0,0,0.7);
             border: 2px solid var(--party-blue);
             z-index: 10;
         }
 
+        /* Panel de Texto */
         .left-panel {
-            flex: 1.2; padding: 40px;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
+            flex: 1.2;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         h1 {
-            font-size: 3.2rem; color: white;
+            font-size: clamp(1.8rem, 5vw, 3.2rem); /* Tamaño dinámico */
+            color: white;
             text-shadow: 3px 3px 0 var(--party-pink);
-            margin-bottom: 5px; line-height: 1.1;
+            margin-bottom: 10px;
+            line-height: 1.1;
         }
 
         #name-display {
             color: var(--party-yellow);
-            font-size: 1.8rem; font-weight: 700;
-            margin-bottom: 35px; text-transform: uppercase;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-transform: uppercase;
         }
 
-        .countdown { display: flex; gap: 15px; }
+        /* Contador Flexible */
+        .countdown {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap; /* Permite que los cuadros bajen en móviles pequeños */
+        }
 
         .time-box {
-            background: rgba(0,0,0,0.3); border: 2px solid white;
-            border-radius: 20px; padding: 15px; min-width: 90px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid white;
+            border-radius: 20px;
+            padding: 15px 10px;
+            min-width: 80px;
+            flex: 1;
         }
 
         .box-d { border-bottom: 6px solid var(--party-green); }
@@ -74,16 +99,62 @@
         .box-m { border-bottom: 6px solid var(--party-blue); }
         .box-s { border-bottom: 6px solid var(--party-orange); }
 
-        .number { font-size: 2.5rem; font-weight: 900; color: white; display: block; }
-        .label { font-size: 0.7rem; color: #aaa; font-weight: bold; }
+        .number { 
+            font-size: clamp(1.5rem, 4vw, 2.5rem); 
+            font-weight: 900; 
+            color: white; 
+            display: block; 
+        }
+        
+        .label { 
+            font-size: 0.65rem; 
+            color: #aaa; 
+            font-weight: bold; 
+        }
 
-        .right-panel { flex: 0.8; background: #222; }
-        #card-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* Panel de Imagen */
+        .right-panel {
+            flex: 0.8;
+            background: #222;
+            min-height: 300px;
+        }
 
+        #card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* AJUSTES PARA MÓVILES (Pantallas de menos de 768px) */
         @media (max-width: 768px) {
-            .card { flex-direction: column; height: auto; }
-            .right-panel { height: 250px; }
-            h1 { font-size: 2rem; }
+            .card {
+                flex-direction: column-reverse; /* Imagen arriba, texto abajo */
+                height: auto;
+                max-width: 450px;
+                border-radius: 30px;
+            }
+
+            .right-panel {
+                flex: none;
+                height: 350px; /* Tamaño fijo para la foto en móvil */
+            }
+
+            .left-panel {
+                padding: 30px 15px;
+            }
+
+            .countdown {
+                display: grid;
+                grid-template-columns: 1fr 1fr; /* 2x2 en móviles */
+                width: 100%;
+                gap: 10px;
+            }
+
+            .time-box {
+                min-width: unset;
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -98,12 +169,12 @@
             <div class="countdown">
                 <div class="time-box box-d"><span class="number" id="d">00</span><span class="label">DÍAS</span></div>
                 <div class="time-box box-h"><span class="number" id="h">00</span><span class="label">HORAS</span></div>
-                <div class="time-box box-m"><span class="number" id="m">00</span><span class="label">MINUTOS</span></div>
-                <div class="time-box box-s"><span class="number" id="s">00</span><span class="label">SEGUNDOS</span></div>
+                <div class="time-box box-m"><span class="number" id="m">00</span><span class="label">MINS</span></div>
+                <div class="time-box box-s"><span class="number" id="s">00</span><span class="label">SEGS</span></div>
             </div>
         </div>
         <div class="right-panel">
-            <img id="card-image" src="https://i.imgur.com/8Q5X12K.png" alt="Retrato de Miriam">
+            <img id="card-image" src="https://i.imgur.com/8Q5X12K.png" alt="Retrato Miriam">
         </div>
     </div>
 
@@ -115,44 +186,46 @@
 
         function initCountdown() {
             // Fecha fija: 9 de Enero
-            const birthMonth = 0; // Enero es 0 en JS
+            const birthMonth = 0; 
             const birthDay = 9;
 
             countdownInterval = setInterval(() => {
                 const now = new Date();
-                // Calcula el próximo 9 de enero a las 12:00 PM
                 let target = new Date(now.getFullYear(), birthMonth, birthDay, 12, 0, 0);
                 
-                // Si hoy ya pasó el mediodía del 9 de enero, apunta al próximo año
                 if (now > target) {
                     target.setFullYear(now.getFullYear() + 1);
                 }
                 
                 const diff = target - now;
 
-                // Si es el momento del cumpleaños (entre las 12 PM y las 11:59 PM de ese día)
                 if (diff <= 0 && diff > -43200000) {
                     if (!isCelebrating) startCelebration();
-                    document.getElementById('d').innerText = "00";
-                    document.getElementById('h').innerText = "00";
-                    document.getElementById('m').innerText = "00";
-                    document.getElementById('s').innerText = "00";
+                    updateDigits(0, 0, 0, 0);
                     return;
                 }
 
                 isCelebrating = false;
-                document.getElementById('d').innerText = Math.floor(diff/86400000).toString().padStart(2,'0');
-                document.getElementById('h').innerText = Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
-                document.getElementById('m').innerText = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
-                document.getElementById('s').innerText = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+                const d = Math.floor(diff/86400000);
+                const h = Math.floor((diff%86400000)/3600000);
+                const m = Math.floor((diff%3600000)/60000);
+                const s = Math.floor((diff%60000)/1000);
+                updateDigits(d, h, m, s);
             }, 1000);
+        }
+
+        function updateDigits(days, hours, mins, secs) {
+            document.getElementById('d').innerText = days.toString().padStart(2,'0');
+            document.getElementById('h').innerText = hours.toString().padStart(2,'0');
+            document.getElementById('m').innerText = mins.toString().padStart(2,'0');
+            document.getElementById('s').innerText = secs.toString().padStart(2,'0');
         }
 
         function startCelebration() {
             if(isCelebrating) return;
             isCelebrating = true;
             resizeCanvas();
-            confetti = Array.from({length: 150}, () => ({
+            confetti = Array.from({length: 120}, () => ({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height - canvas.height,
                 size: Math.random() * 8 + 4,
@@ -199,10 +272,10 @@
 
             fireworks.forEach((f) => {
                 if (!f.exploded) {
-                    f.y -= 7; ctx.fillStyle = f.color; ctx.fillRect(f.x, f.y, 3, 15);
+                    f.y -= 7; ctx.fillStyle = f.color; ctx.fillRect(f.x, f.y, 3, 12);
                     if (f.y <= f.targetY) {
                         f.exploded = true;
-                        for (let j = 0; j < 35; j++) {
+                        for (let j = 0; j < 30; j++) {
                             const ang = Math.random() * Math.PI * 2;
                             const spd = Math.random() * 5 + 2;
                             f.particles.push({ x: f.x, y: f.y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, alpha: 1 });
@@ -210,10 +283,10 @@
                     }
                 } else {
                     f.particles.forEach(p => {
-                        p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.alpha -= 0.015;
+                        p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.alpha -= 0.018;
                         ctx.globalAlpha = Math.max(0, p.alpha);
                         ctx.fillStyle = f.color;
-                        ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
                     });
                     f.particles = f.particles.filter(p => p.alpha > 0);
                 }
